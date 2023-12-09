@@ -2,18 +2,45 @@ const firebaseConfig = require('./firebaseConfig.js');
 const firestore = firebaseConfig.firestore;
 
 
-// firebase deploy --only functions
+/* 
+firebase deploy --only functions
+*/
 function addDocument(data) {
-	firestore.collection(data.collectionName).add({
-		activity: "Income",
-		storageFileName: data.object.name,
-		fileType: data.object.contentType,
-		dateUploaded: new Date(),
-		ocr: data.ocr,
-		taxrate:"25%", 
-
-		...(data.total && {
-			taxtotal:parseFloat((data.total * 0.2).toFixed(2)),
+	const fileId = data.object.name.replace('files/', '');
+  
+	// Query "fileDetails" collection to find entry with matching ID
+	return firestore.collection('fileDetails')
+	  .where('id', '==', fileId)
+	  .limit(1)
+	  .get()
+	  .then(fileDetailsQuery => {
+		const fileDetailsDoc = fileDetailsQuery.docs[0];
+  
+		// Initialize ultimateLink to a default value or placeholder
+		let ultimateLinker = 'default-placeholder-link';
+  
+		// Check if a matching fileDetails entry is found
+		if (fileDetailsDoc) {
+		  const fileDetailsData = fileDetailsDoc.data();
+  
+		  // Use the URL from fileDetails if available
+		  ultimateLinker = fileDetailsData.url;
+		} else {
+		  console.error(`No matching entry found in fileDetails for ID: ${fileId}`);
+		  ultimateLinker = "No matching entry found in fileDetails found";
+		}
+  
+		// Continue with the document creation
+		return firestore.collection(data.collectionName).add({
+		  activity: "Income",
+		  storageFileName: data.object.name,
+		  fileType: data.object.contentType,
+		  dateUploaded: new Date(),
+		  ocr: data.ocr,
+		  taxrate: "25%",
+  
+		  ...(data.total && {
+			taxtotal: parseFloat((data.total * 0.2).toFixed(2)),
 			
 				/*
 				data.taxrate === "25%"
@@ -28,25 +55,29 @@ function addDocument(data) {
 				*/
 		  }),
 
-		documentType: '',
-		exported: false,
-		reviewed: false,
-		ref: '',
-		...(data.name && {
+		  documentType: '',
+		  exported: false,
+		  reviewed: false,
+		  ref: '',
+		  ...(data.name && {
 			name: data.name,
-		}),
-		...(data.category && {
+		  }),
+		  ...(data.category && {
 			category: data.category,
-		}),
-		...(data.date && {
+		  }),
+		  ...(data.date && {
 			date: firebaseConfig.admin.firestore.Timestamp.fromDate(data.date),
-		}),
-		...(data.total && {
+		  }),
+		  ...(data.total && {
 			total: data.total,
-		}),
-
-	});
-}
+		  }),
+  
+		  ultimateLink: ultimateLinker,
+  
+		  id: data.object,
+		});
+	  });
+  }
 
 function matchAndUpdateDocument(data) {
 	return firestore

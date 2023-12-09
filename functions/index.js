@@ -35,7 +35,11 @@ exports.uploadFile = functions.storage.object().onFinalize(async object => {
 	if (object.name.indexOf('files/') === 0) { //avgör om filen är en pdf eller något annat (tex jpeg eller png)
 		if (object.contentType === 'application/pdf') {
 			processors.processPdf(object);
-		} else if (object.contentType === 'image/jpeg' || object.contentType === 'image/png') {
+		} else if (
+			object.contentType === 'image/jpeg' || 
+			object.contentType === 'image/png' ||
+			object.contentType === 'image/jpg'
+			) {
 			processors.processImage(object);
 		}
 	} else if (object.name.indexOf('pdfFiles/') === 0) {
