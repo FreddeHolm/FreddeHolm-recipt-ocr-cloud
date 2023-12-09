@@ -74,7 +74,7 @@ function addDocument(data) {
   
 		  ultimateLink: ultimateLinker,
   
-		  id: data.object,
+		  //id: data.object,
 		});
 	  });
   }
