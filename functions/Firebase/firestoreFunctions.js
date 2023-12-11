@@ -18,6 +18,7 @@ function addDocument(data) {
   
 		// Initialize ultimateLink to a default value or placeholder
 		let ultimateLinker = 'default-placeholder-link';
+		let ultimateFileNamer = 'default-placeholder-filename';
   
 		// Check if a matching fileDetails entry is found
 		if (fileDetailsDoc) {
@@ -25,9 +26,12 @@ function addDocument(data) {
   
 		  // Use the URL from fileDetails if available
 		  ultimateLinker = fileDetailsData.url;
+		  ultimateFileNamer = fileDetailsData.fileName;
+
 		} else {
 		  console.error(`No matching entry found in fileDetails for ID: ${fileId}`);
-		  ultimateLinker = "No matching entry found in fileDetails found";
+		  ultimateLinker = "No matching entry found in fileDetails";
+		  ultimateFileNamer = "No matching filename found in fileDetails ";
 		}
   
 		// Continue with the document creation
@@ -41,6 +45,23 @@ function addDocument(data) {
   
 		  ...(data.total && {
 			taxtotal: parseFloat((data.total * 0.2).toFixed(2)),
+			
+				/*
+				data.taxrate === "25%"
+				? parseFloat((data.total * 0.2).toFixed(2)) // 25 / (100 + 25)
+				: data.taxrate === "0%"
+				? parseFloat((data.total * 0.0).toFixed(2))
+				: data.taxrate === "12%"
+				? parseFloat((data.total * 0.1071).toFixed(2)) // 12 / (100 + 12)
+				: data.taxrate === "6%"
+				? parseFloat((data.total * (6 / (100 + 6))).toFixed(2)) // 6 / (100 + 6)
+				: parseFloat((data.total * 0.2).toFixed(2)),
+				*/
+		  }),
+
+		  
+		  ...(data.total && data.taxtotal && {
+			taxlesstotal: parseFloat((data.total *0.8).toFixed(2)),
 			
 				/*
 				data.taxrate === "25%"
@@ -73,6 +94,8 @@ function addDocument(data) {
 		  }),
   
 		  ultimateLink: ultimateLinker,
+
+		  ultimateFileName: ultimateFileNamer
   
 		  //id: data.object,
 		});
@@ -95,6 +118,7 @@ function matchAndUpdateDocument(data) {
 
 			if (data.total || !data.total === null) temp.total = data.total;
 			if (data.total || !data.total === null) temp.taxtotal = data.total*0.2;
+			if (data.total || !data.total === null) temp.taxlesstotal = data.total*0.8;
 
 			document.ref.update(temp);
 		});

@@ -40,6 +40,10 @@ async function processImage(object) {
 		  }),
 
 		...(parseData.total && {
+			taxlesstotal:parseFloat((parseData.total*0.8).toFixed(2)),
+		}),
+
+		...(parseData.total && {
 			total: parseFloat(parseData.total),
 		}),
 	};
@@ -82,6 +86,9 @@ async function processJson(object) {
 		}),
 		...(parseData.total && {
 			taxtotal:parseInt((parseData.total * 0.2).toFixed(2)),	
+		  }),
+		...(parseData.total && parseData.taxtotal && {
+			taxlesstotal:parseInt((parseData.total *0.8).toFixed(2)),	
 		  }),
 		...(parseData.total && {
 			total: parseInt(parseData.total),
