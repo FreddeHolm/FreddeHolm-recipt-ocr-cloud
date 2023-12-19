@@ -77,14 +77,18 @@ function addDocument(data) {
 		  }),
 
 		  documentType: '',
+
 		  exported: false,
 		  reviewed: false,
 		  ref: '',
 		  ...(data.name && {
 			name: data.name,
 		  }),
-		  ...(data.category && {
+		  ...(data.category ? {
 			category: data.category,
+		  }
+		 : {
+			category: '',
 		  }),
 		  ...(data.date && {
 			date: firebaseConfig.admin.firestore.Timestamp.fromDate(data.date),
@@ -125,3 +129,17 @@ function matchAndUpdateDocument(data) {
 }
 
 module.exports = { addDocument, matchAndUpdateDocument };
+
+
+/*
+
+Inga nya märken - kommer bli en långsammare försäljning
+
+Märken med väldigt höga kvantiteter, tar långt tid att sälja slut på
+En del svårsålda märken, typ skåne, jämtland gottland etc flaggorna 
+
+
+20 000 nu
+15 000 om 18 månader
+
+*/
